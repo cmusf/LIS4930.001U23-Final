@@ -32,7 +32,16 @@ else:
     # Print the location
     print("I've detected your location as being near: " + location)
 
+class Weather:
+    # Create a weather class for each weather value
+    def __init__(self, time, weather, temp, humidity):
+        self.time = time
+        self.weather = weather
+        self.temp = temp
+        self.humidity = humidity
 
+    def __str__(self):
+        return self.time + ' ' + self.weather + ' ' + self.temp + ' ' + self.humidity
 
 
 # Get the weather data
@@ -44,10 +53,21 @@ else:
 response = requests.get(url)
 data = response.json()
 
+
+# Create a list of weather objects
+weatherList = []
+for item in data['list']:
+    weatherList.append(Weather(item['dt_txt'], item['weather'][0]['description'], str(item['main']['temp']) + '°F', item['main']['humidity']))
+
 # Format the data into a table
 table = prettytable.PrettyTable(['Time', 'Weather', 'Temperature', 'Humidity'])
 
-for item in data['list']:
-    table.add_row([item['dt_txt'], item['weather'][0]['description'], str(item['main']['temp']) + '°F', item['main']['humidity']])
+for item in weatherList:
+    table.add_row([item.time, item.weather, item.temp, item.humidity])
 
 print(table)
+
+# Write to weather_report.txt
+with open('weather_report.txt', 'w') as file:
+    file.write(str(table))
+    file.close()
